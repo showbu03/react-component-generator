@@ -1,4 +1,5 @@
-import { useState, useCallback } from 'react';
+import { useCallback, useState } from 'react';
+import { useLocalStorage } from './useLocalStorage';
 import type { GeneratedComponent, Provider } from '../types';
 
 interface UseComponentGeneratorReturn {
@@ -11,7 +12,18 @@ interface UseComponentGeneratorReturn {
 }
 
 export function useComponentGenerator(): UseComponentGeneratorReturn {
-  const [components, setComponents] = useState<GeneratedComponent[]>([]);
+  const STORAGE_KEY = 'rcg:components';
+
+  const dateReviver = (_key: string, value: unknown) => {
+    if (_key === 'createdAt' && typeof value === 'string') return new Date(value);
+    return value;
+  };
+
+  const [components, setComponents] = useLocalStorage<GeneratedComponent[]>(
+    STORAGE_KEY,
+    [],
+    { reviver: dateReviver }
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
