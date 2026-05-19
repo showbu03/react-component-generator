@@ -1,12 +1,45 @@
 import { renderHook, act } from '@testing-library/react';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { useLocalStorage } from './useLocalStorage';
 
-declare const localStorage: Storage;
+const createLocalStorageMock = () => {
+  let store: Record<string, string> = {};
+
+  return {
+    getItem: (key: string) => store[key] ?? null,
+    setItem: (key: string, value: string) => {
+      store[key] = String(value);
+    },
+    removeItem: (key: string) => {
+      delete store[key];
+    },
+    clear: () => {
+      store = {};
+    },
+    get length() {
+      return Object.keys(store).length;
+    },
+    key: (index: number) => {
+      const keys = Object.keys(store);
+      return keys[index] ?? null;
+    },
+  } as Storage;
+};
+
+let localStorageMock: Storage;
 
 describe('useLocalStorage', () => {
   beforeEach(() => {
-    localStorage.clear();
+    localStorageMock = createLocalStorageMock();
+    Object.defineProperty(global, 'localStorage', {
+      value: localStorageMock,
+      writable: true,
+      configurable: true,
+    });
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it('초기값이 없으면 initialValue를 반환한다', () => {
@@ -44,7 +77,8 @@ describe('useLocalStorage', () => {
     const { result } = renderHook(() => useLocalStorage('test-key', 'initial'));
     const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    const setItemSpy = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+    const originalSetItem = localStorage.setItem;
+    localStorage.setItem = vi.fn(() => {
       throw new Error('QuotaExceededError');
     });
 
@@ -54,7 +88,9 @@ describe('useLocalStorage', () => {
 
     expect(result.current[0]).toBe('new-value');
     expect(consoleErrorSpy).toHaveBeenCalled();
-    setItemSpy.mockRestore();
+
+    localStorage.setItem = originalSetItem;
+    consoleErrorSpy.mockRestore();
   });
 
   it('reviver 함수가 있으면 역직렬화 시 적용된다', () => {
