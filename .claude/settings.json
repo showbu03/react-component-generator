@@ -1,5 +1,19 @@
 {
   "enabledPlugins": {
     "frontend-design@claude-plugins-official": true
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "agent",
+            "prompt": "파일이 저장되었습니다. 변경사항을 smart-commit 스킬로 자동 커밋하세요. 필요한 경우 확인 후 진행하세요.",
+            "statusMessage": "변경사항을 분석하여 커밋 중..."
+          }
+        ]
+      }
+    ]
   }
 }
