@@ -1,5 +1,9 @@
 import { vi } from 'vitest';
 
+declare global {
+  var localStorage: Storage;
+}
+
 const localStorageMock = (() => {
   let store: Record<string, string> = {};
 
@@ -21,7 +25,7 @@ const localStorageMock = (() => {
       const keys = Object.keys(store);
       return keys[index] ?? null;
     },
-  };
+  } as Storage;
 })();
 
-globalThis.localStorage = localStorageMock as any;
+global.localStorage = localStorageMock;
