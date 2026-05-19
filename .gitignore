@@ -30,3 +30,9 @@ dist-ssr
 .claude/worktrees/
 
 .env
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+.auth/
