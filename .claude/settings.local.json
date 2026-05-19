@@ -12,7 +12,8 @@
       "Edit(*)",
       "Glob(*)",
       "Grep(*)",
-      "Skill(pr-create)"
+      "Skill(pr-create)",
+      "Skill(evaluator)"
     ],
     "deny": []
   }
