@@ -735,3 +735,52 @@
     padding: 18px;
   }
 }
+
+/* 뷰포트 컨트롤 */
+.viewport-controls {
+  display: flex;
+  gap: 4px;
+}
+
+.btn-viewport {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 28px;
+  padding: 0;
+  background: var(--surface-subtle);
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.16s ease, border-color 0.16s ease;
+}
+
+.btn-viewport:hover {
+  background: var(--surface-muted);
+  border-color: var(--line);
+}
+
+.btn-viewport--active {
+  background: var(--primary-soft);
+  border-color: var(--primary);
+}
+
+.viewport-icon {
+  display: block;
+  border: 1.5px solid var(--text-muted);
+  border-radius: 1.5px;
+}
+
+.viewport-icon--mobile  { width: 8px;  height: 13px; }
+.viewport-icon--tablet  { width: 11px; height: 14px; }
+.viewport-icon--desktop { width: 15px; height: 11px; border-radius: 1px; }
+
+.btn-viewport--active .viewport-icon {
+  border-color: var(--primary);
+}
+
+/* 미리보기 뷰포트 모드 */
+.preview-render--mobile  { max-width: 390px; margin: 0 auto; transition: max-width 0.25s ease; }
+.preview-render--tablet  { max-width: 768px; margin: 0 auto; transition: max-width 0.25s ease; }
+.preview-render--desktop { max-width: 100%;  transition: max-width 0.25s ease; }

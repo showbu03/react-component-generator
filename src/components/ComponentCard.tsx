@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { GeneratedComponent } from '../types';
-import { LivePreview } from './LivePreview';
+import { LivePreview, type ViewportMode } from './LivePreview';
 import { CodeView } from './CodeView';
 
 interface ComponentCardProps {
@@ -15,6 +15,7 @@ type Tab = 'preview' | 'code';
 export function ComponentCard({ component, onRemove, onRegenerate, isLoading }: ComponentCardProps) {
   const [activeTab, setActiveTab] = useState<Tab>('preview');
   const [previewKey, setPreviewKey] = useState(0);
+  const [viewportMode, setViewportMode] = useState<ViewportMode>('desktop');
   const createdAt = component.createdAt.toLocaleTimeString('ko-KR', {
     hour: '2-digit',
     minute: '2-digit',
@@ -67,7 +68,12 @@ export function ComponentCard({ component, onRemove, onRegenerate, isLoading }: 
       </div>
       <div className="card-content">
         {activeTab === 'preview' ? (
-          <LivePreview key={previewKey} code={component.code} />
+          <LivePreview
+            key={previewKey}
+            code={component.code}
+            viewportMode={viewportMode}
+            onViewportChange={setViewportMode}
+          />
         ) : (
           <CodeView code={component.code} />
         )}
