@@ -1,10 +1,11 @@
-import { vi } from 'vitest';
+import { beforeEach } from 'vitest';
+import '@testing-library/jest-dom';
 
 declare global {
   var localStorage: Storage;
 }
 
-const localStorageMock = (() => {
+const createStorageMock = (): Storage => {
   let store: Record<string, string> = {};
 
   return {
@@ -21,11 +22,12 @@ const localStorageMock = (() => {
     get length() {
       return Object.keys(store).length;
     },
-    key: (index: number) => {
-      const keys = Object.keys(store);
-      return keys[index] ?? null;
-    },
+    key: (index: number) => Object.keys(store)[index] ?? null,
   } as Storage;
-})();
+};
 
-global.localStorage = localStorageMock;
+global.localStorage = createStorageMock();
+
+beforeEach(() => {
+  localStorage.clear();
+});
