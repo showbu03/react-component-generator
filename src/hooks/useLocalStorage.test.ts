@@ -1,47 +1,11 @@
 import { renderHook, act } from '@testing-library/react';
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { useLocalStorage } from './useLocalStorage';
 
-const createLocalStorageMock = () => {
-  let store: Record<string, string> = {};
-
-  return {
-    getItem: (key: string) => store[key] ?? null,
-    setItem: (key: string, value: string) => {
-      store[key] = String(value);
-    },
-    removeItem: (key: string) => {
-      delete store[key];
-    },
-    clear: () => {
-      store = {};
-    },
-    get length() {
-      return Object.keys(store).length;
-    },
-    key: (index: number) => {
-      const keys = Object.keys(store);
-      return keys[index] ?? null;
-    },
-  } as Storage;
-};
-
-let localStorageMock: Storage;
+// vitest.setup.ts가 beforeEach에서 localStorage.clear()를 호출하므로
+// 각 테스트는 빈 스토어에서 시작한다.
 
 describe('useLocalStorage', () => {
-  beforeEach(() => {
-    localStorageMock = createLocalStorageMock();
-    Object.defineProperty(global, 'localStorage', {
-      value: localStorageMock,
-      writable: true,
-      configurable: true,
-    });
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
   it('초기값이 없으면 initialValue를 반환한다', () => {
     const { result } = renderHook(() => useLocalStorage('test-key', 'initial'));
     expect(result.current[0]).toBe('initial');
@@ -63,6 +27,17 @@ describe('useLocalStorage', () => {
     expect(localStorage.getItem('test-key')).toBe(JSON.stringify('updated'));
   });
 
+  it('함수형 업데이트로 이전 값을 참조해 변경할 수 있다', () => {
+    const { result } = renderHook(() => useLocalStorage<number[]>('test-key', [1, 2]));
+
+    act(() => {
+      result.current[1]((prev) => [...prev, 3]);
+    });
+
+    expect(result.current[0]).toEqual([1, 2, 3]);
+    expect(JSON.parse(localStorage.getItem('test-key')!)).toEqual([1, 2, 3]);
+  });
+
   it('JSON 파싱 오류 시 initialValue로 폴백한다', () => {
     localStorage.setItem('test-key', 'invalid-json-{]');
     const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -76,9 +51,7 @@ describe('useLocalStorage', () => {
   it('QuotaExceededError 시 state는 유지되고 에러를 기록한다', () => {
     const { result } = renderHook(() => useLocalStorage('test-key', 'initial'));
     const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
-    const originalSetItem = localStorage.setItem;
-    localStorage.setItem = vi.fn(() => {
+    const setItemSpy = vi.spyOn(localStorage, 'setItem').mockImplementation(() => {
       throw new Error('QuotaExceededError');
     });
 
@@ -89,7 +62,7 @@ describe('useLocalStorage', () => {
     expect(result.current[0]).toBe('new-value');
     expect(consoleErrorSpy).toHaveBeenCalled();
 
-    localStorage.setItem = originalSetItem;
+    setItemSpy.mockRestore();
     consoleErrorSpy.mockRestore();
   });
 
@@ -98,18 +71,12 @@ describe('useLocalStorage', () => {
     localStorage.setItem('test-key', JSON.stringify(testData));
 
     const reviver = (_key: string, value: unknown) => {
-      if (_key === 'date' && typeof value === 'string') {
-        return new Date(value);
-      }
+      if (_key === 'date' && typeof value === 'string') return new Date(value);
       return value;
     };
 
     const { result } = renderHook(() =>
-      useLocalStorage<{ date: Date | string }>(
-        'test-key',
-        { date: 'default' },
-        { reviver }
-      )
+      useLocalStorage<{ date: Date | string }>('test-key', { date: 'default' }, { reviver })
     );
 
     expect(result.current[0].date instanceof Date).toBe(true);
