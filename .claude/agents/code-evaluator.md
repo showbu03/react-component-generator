@@ -16,7 +16,7 @@ model: sonnet
 
 ## 평가 체크리스트
 
-### 1. TDD 준수 (`~/.claude/rules/tdd.md` 기준)
+### 1. TDD 준수 (`.claude/rules/tdd.md` 기준)
 
 - `src/*.ts(x)` 에 대응되는 `*.test.ts(x)` 가 같은 디렉토리에 있는가
 - 테스트가 **동작**을 검증하는가, **구현**을 복제하는가

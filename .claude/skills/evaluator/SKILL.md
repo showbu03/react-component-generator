@@ -58,7 +58,7 @@ git diff --name-only HEAD~1 HEAD
 다음 규칙 컨텍스트를 참고한다 (Read로 로드):
 - ./AGENTS.md (golden rules)
 - ./src/AGENTS.md 또는 ./server/AGENTS.md (해당하는 쪽)
-- ./.claude/rules/tdd.md (TDD 규칙)
+- .claude/rules/tdd.md (TDD 규칙)
 
 4가지 관점에서 각각 독립적으로 검토하라:
 
