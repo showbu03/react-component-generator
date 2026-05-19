@@ -619,7 +619,7 @@
   align-items: center;
   min-height: 320px;
   padding: 34px;
-  background-color: var(--surface-subtle);
+  background-color: #ff8c00;
   background-image:
     linear-gradient(var(--line) 1px, transparent 1px),
     linear-gradient(90deg, var(--line) 1px, transparent 1px);
