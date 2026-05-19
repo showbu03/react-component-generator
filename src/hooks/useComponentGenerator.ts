@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useLocalStorage } from './useLocalStorage';
 import type { GeneratedComponent, Provider } from '../types';
 
