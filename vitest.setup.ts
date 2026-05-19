@@ -1,4 +1,5 @@
 import { beforeEach } from 'vitest';
+import '@testing-library/jest-dom';
 
 declare global {
   var localStorage: Storage;
